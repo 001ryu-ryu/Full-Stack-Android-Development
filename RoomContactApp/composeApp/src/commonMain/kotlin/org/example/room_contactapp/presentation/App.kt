@@ -51,7 +51,7 @@ fun App(roomdbBuilder: RoomDatabase.Builder<ContactDatabase>) {
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                Text("Empty")
             }
         } else {
             LazyColumn {
