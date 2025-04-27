@@ -15,8 +15,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val dbBuilder = remember { mutableStateOf(DatabaseFactory(applicationContext).create()) }
-            App(dbBuilder.value)
+            App()
         }
     }
 }

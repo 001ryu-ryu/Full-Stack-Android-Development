@@ -34,45 +34,9 @@ import roomcontactapp.composeapp.generated.resources.compose_multiplatform
 
 @Composable
 @Preview
-fun App(roomdbBuilder: RoomDatabase.Builder<ContactDatabase>) {
+fun App() {
     MaterialTheme {
-        val db = dbBuildertoDb(roomdbBuilder)
 
-        val contacts = remember { mutableStateOf(listOf<Contact>()) }
-
-        GlobalScope.launch {
-            db.contactDao.getContacts().collectLatest {
-                contacts.value = it
-            }
-        }
-
-        if (contacts.value.isNullOrEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Empty")
-            }
-        } else {
-            LazyColumn {
-
-                items(contacts.value) {
-                    Card(
-                        modifier = Modifier.fillMaxWidth().padding(10.dp).wrapContentHeight()
-                    ) {
-                        Column {
-                            Text(it.firstName)
-                            Text(it.lastName)
-                            Text(it.phoneNumber)
-                            Text(it.email)
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
-fun dbBuildertoDb(roomdbBuilder: RoomDatabase.Builder<ContactDatabase>): ContactDatabase {
-    return roomdbBuilder.setDriver(BundledSQLiteDriver()).fallbackToDestructiveMigration(true).build()
-}
