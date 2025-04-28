@@ -91,7 +91,7 @@ def insertSellHistory(productId, quantity, remainingStock, totalAmount, price, p
         dateOfSell = date.today()
 
         cursor.execute('''
-INSERT INTO Sell_History(sell_id, product_id, quantity, remaining_stock, date_of_sell, total_amount, price, product_name, user_id, user_name)
+INSERT INTO Sell_History(sell_id, product_id, quantity, remaining_stock, date_of_sell, total_amount, price, product_name, user_id, user_name) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ''', (sellId, productId, quantity, remainingStock, dateOfSell, totalAmount, price, productName, userId, userName))
         conn.commit()
         conn.close()

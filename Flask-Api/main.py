@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 
 from createTableOperation import createTable
 from addOperation import *
@@ -8,6 +8,12 @@ from updateOperation import *
 from getIds import *
 
 app = Flask(__name__)  # this name is the file name
+
+@app.route('/docs', methods = ['GET'])
+def docs():
+    return render_template('docs.html')
+
+
 
 @app.route('/', methods=['GET'])
 def hello():
