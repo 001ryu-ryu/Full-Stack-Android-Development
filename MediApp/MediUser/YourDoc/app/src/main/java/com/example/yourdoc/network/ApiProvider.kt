@@ -4,10 +4,11 @@ import com.example.yourdoc.utils.BASE_URL
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 
 object ApiProvider {
 
     fun providerApiService() =
         Retrofit.Builder().baseUrl(BASE_URL).client(OkHttpClient.Builder().build()).addConverterFactory(
-            GsonConverterFactory.create()).build()
+            GsonConverterFactory.create()).build().create(ApiServices::class.java)
 }
