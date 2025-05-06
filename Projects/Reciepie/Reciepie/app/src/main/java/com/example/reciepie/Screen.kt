@@ -1,0 +1,6 @@
+package com.example.reciepie
+
+sealed class Screen(val route: String) {
+    object RecipeScreen: Screen("recipescreen")
+    object DetailScreen: Screen("detailscreen")
+}
