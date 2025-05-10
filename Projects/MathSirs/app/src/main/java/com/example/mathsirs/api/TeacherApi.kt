@@ -9,7 +9,7 @@ import retrofit2.http.Headers
 
 interface TeacherApi {
     @GET(ENDPOINT)
-    suspend fun getTeacher(@Header("X-JSON-Path") name: String): Response<List<TeacherDetails>>
+    suspend fun getTeacher(@Header("X-JSON-Path") name: String): Response<List<TeacherDetails>> //pass the parameter as a header
     @GET(ENDPOINT)
     @Headers("X-JSON-Path: teachers..name")
     suspend fun getName(): Response<List<String>>

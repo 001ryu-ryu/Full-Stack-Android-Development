@@ -1,5 +1,6 @@
 package com.example.mathsirs.ui.screens
 
+import android.R
 import android.annotation.SuppressLint
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,11 +38,14 @@ import com.example.mathsirs.viewmodels.ProfilePictureViewmodel
 
 
 @Composable
-fun ProfilePictureScreen() {
-    val profilePictureViewmodel: ProfilePictureViewmodel = viewModel()
-    val nameViewmodel: NameViewModel = viewModel()
+fun ProfilePictureScreen(onClick: (name: String) -> Unit) {
+    
+    //here we will need to create a viewmodel object cuz to show the data in items
+    val profilePictureViewmodel: ProfilePictureViewmodel = hiltViewModel() // this viewmodel method will create an object of ProfilePictureViewmodel and assign it to the variable
+    val nameViewmodel: NameViewModel = hiltViewModel()
     val names: State<List<String>> = nameViewmodel.name.collectAsState()
     val profilePictures: State<List<String>> = profilePictureViewmodel.profilePicture.collectAsState()
+    // collectAsState() jese jese state update hota rahefa wese wese rerender and update the state
     if (profilePictures.value.isEmpty()) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -56,9 +61,7 @@ fun ProfilePictureScreen() {
         ) {
             items(names.value.zip(profilePictures.value)) {
                 (name, profilePicture) ->
-                ProfilePicture(name, profilePicture) {
-
-                }
+                ProfilePicture(name, profilePicture, onClick)
 //                items(names.value.zip(profilePictures.value)) { (name, profilePicture) ->
 //                    ProfilePicture(name = name, profilePicture = profilePicture) { }
 //                }
@@ -70,12 +73,12 @@ fun ProfilePictureScreen() {
 
 @SuppressLint("InvalidColorHexValue")
 @Composable
-fun ProfilePicture(name: String, profilePicture: String, onClick: (profilePicture: String) -> Unit) {
+fun ProfilePicture(name: String?, profilePicture: String?, onClick: (name: String) -> Unit = {}) {
     Box(
         modifier = Modifier
             .padding(4.dp).
         clickable {
-            onClick(profilePicture)
+            onClick(name!!)
         }
             .size(144.dp)
             .clip(RoundedCornerShape(8.dp))
@@ -83,8 +86,8 @@ fun ProfilePicture(name: String, profilePicture: String, onClick: (profilePictur
             .border(1.dp, Color(0xFFC822F1)),
         contentAlignment = Alignment.BottomCenter
     ) {
-        Text(text = name, modifier = Modifier
-            .padding(0.dp, 20.dp), color = Color.White,
+        Text(text = name!!, modifier = Modifier
+            .padding(0.dp, 20.dp),
             fontSize = 18.sp, style = MaterialTheme.typography.bodyMedium)
     }
 }

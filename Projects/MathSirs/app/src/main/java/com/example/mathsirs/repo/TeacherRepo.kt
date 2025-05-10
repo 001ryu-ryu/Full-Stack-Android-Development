@@ -15,7 +15,10 @@ class TeacherRepo @Inject constructor(private val teacherApi: TeacherApi) {
     suspend fun getTeacher(name: String) {
         val response = teacherApi.getTeacher("teachers[?(@.name==\"$name\")]")
         if (response.isSuccessful && response.body() != null) {
-            _teacher.emit(response.body()!!)
+            //here we will get the data from server
+            //that data we will have to pass to viewmodel, and from viewmodel to view
+            //for that we will use observable, that's why we defined a variable of StateFlow above
+            _teacher.emit(response.body()!!) // here we emitted the new data to the _teacher StateFlow variable
         }
     }
 
