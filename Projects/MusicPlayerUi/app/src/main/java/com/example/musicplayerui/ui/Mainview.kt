@@ -2,9 +2,14 @@ package com.example.musicplayerui.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,16 +17,22 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.IconButton
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.primarySurface
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,12 +51,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.musicplayerui.AccountDialog
 import com.example.musicplayerui.MainViewModel
+import com.example.musicplayerui.R
 import com.example.musicplayerui.Screen
 import com.example.musicplayerui.screensInBottom
 import com.example.musicplayerui.screensInDrawer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import kotlin.properties.Delegates
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainView() {
@@ -74,6 +88,18 @@ fun MainView() {
         mutableStateOf(currentScreen.title)
     }
 
+    // Variables for ModalBottomSheet
+    val isSheetFullScreen by remember { 
+
+        mutableStateOf(false)
+    }
+
+    val modalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmValueChange = {it != ModalBottomSheetValue.HalfExpanded}
+    )
+    val modifier = if (isSheetFullScreen) Modifier.fillMaxSize() else Modifier.fillMaxWidth()
+
     val bottomBar: @Composable () -> Unit = {
         if (currentScreen is Screen.DrawerScreen || currentScreen == Screen.BottomScreen.Home) {
             BottomNavigation(modifier = Modifier.wrapContentSize()) {
@@ -101,55 +127,82 @@ fun MainView() {
                 }
             }
         }
+
     }
-    
-    
-    Scaffold(
-        bottomBar = bottomBar,
-        topBar = {
-            TopAppBar(
-                title = {Text(title.value)},
-                navigationIcon = {
-                    IconButton(onClick = {
-                        // Open the drawer
-                        scope.launch { 
-                            scaffoldState.drawerState.open()
+
+    ModalBottomSheetLayout(
+        sheetState = modalSheetState,
+        sheetContent = {
+
+            MoreBottomSheet(modifier)
+        }
+    ) {
+
+        Scaffold(
+            bottomBar = bottomBar,
+            topBar = {
+                TopAppBar(
+                    title = {Text(title.value)},
+                    actions = {
+
+                        IconButton(
+                            onClick = {
+                                scope.launch { 
+                                    if (modalSheetState.isVisible)
+                                        modalSheetState.hide()
+                                    else
+                                        modalSheetState.show()
+                                }
+                            }
+                        ) {
+                            Icon(imageVector = Icons.Default.MoreVert, contentDescription = null)
                         }
-                    }) {
-                        Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Menu")
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            // Open the drawer
+                            scope.launch {
+                                scaffoldState.drawerState.open()
+                            }
+                        }) {
+                            Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Menu")
+                        }
                     }
-                }
-            )
-        },
-        
-        scaffoldState = scaffoldState,
-        drawerContent = {
-            LazyColumn(
-                Modifier.padding(16.dp)
-            ) {
+                )
+            },
 
-                items(screensInDrawer) { 
-                    item ->
-                    DrawerItem(selected = currentRoute == item.dRoute, item = item) {
+            scaffoldState = scaffoldState,
+            drawerContent = {
+                LazyColumn(
+                    Modifier.padding(16.dp)
+                ) {
 
-                        scope.launch { 
-                            scaffoldState.drawerState.close() // It closes the drawer whether we tap on side or an item
-                        }
-                        if (item.dRoute == "add_account") {
-                            // Open dialog
-                            dialogOpen.value = true
-                        } else {
-                            controller.navigate(item.dRoute)
-                            title.value = item.dTitle
+                    items(screensInDrawer) {
+                            item ->
+                        DrawerItem(selected = currentRoute == item.dRoute, item = item) {
+
+                            scope.launch {
+                                scaffoldState.drawerState.close() // It closes the drawer whether we tap on side or an item
+                            }
+                            if (item.dRoute == "add_account") {
+                                // Open dialog
+                                dialogOpen.value = true
+                            } else {
+                                controller.navigate(item.dRoute)
+                                title.value = item.dTitle
+                            }
                         }
                     }
                 }
             }
+        ) {
+            Navigation(navController = controller, viewModel = viewModel, pd = it)
+            AccountDialog(dialogOpen)
         }
-    ) {
-        Navigation(navController = controller, viewModel = viewModel, pd = it)
-        AccountDialog(dialogOpen)
+
     }
+    
+    
 }
 
 @Composable
@@ -181,6 +234,28 @@ fun DrawerItem(
             text = item.dTitle,
             style = MaterialTheme.typography.h5
         )
+    }
+}
+
+
+@Composable
+fun MoreBottomSheet(modifier: Modifier) {
+    Box(
+        Modifier.fillMaxWidth().height(300.dp)
+            .background(MaterialTheme.colors.primarySurface)
+    ) {
+        Column(
+            modifier = modifier.padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+
+            Row(modifier = modifier.padding(16.dp)) {
+
+                Icon(modifier = Modifier.padding(end = 8.dp), 
+                    painter = painterResource(id = R.drawable.ic_baseline_person_add_alt_1_24),
+                    contentDescription = null)
+            }
+        }
     }
 }
 
