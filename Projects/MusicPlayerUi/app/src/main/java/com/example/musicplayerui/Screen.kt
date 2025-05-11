@@ -3,6 +3,24 @@ package com.example.musicplayerui
 import androidx.annotation.DrawableRes
 
 sealed class Screen(val title: String, val route: String) {
+    
+    sealed class BottomScreen(
+        val bTitle: String, val bRoute: String, @DrawableRes val icon: Int) : Screen(
+            bTitle, bRoute
+    ) {
+            object Home: BottomScreen(
+                "Home", "home", R.drawable.music_and_home
+            )
+        object Library: BottomScreen(
+            "Library", "library", R.drawable.library_music
+        )
+
+        object Browse: BottomScreen(
+            "Browse", "browse", R.drawable.music_browse
+        )
+        }
+    
+    
     sealed class DrawerScreen(val dTitle: String, val dRoute: String, @DrawableRes val icon: Int) : Screen(
         dTitle, dRoute
     ) {
@@ -25,6 +43,12 @@ sealed class Screen(val title: String, val route: String) {
         )
     }
 }
+
+val screensInBottom = listOf(
+    Screen.BottomScreen.Home,
+    Screen.BottomScreen.Browse,
+    Screen.BottomScreen.Library
+)
 
 val screensInDrawer = listOf(
     Screen.DrawerScreen.Account,
