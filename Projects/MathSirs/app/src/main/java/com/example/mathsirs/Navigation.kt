@@ -17,22 +17,18 @@ fun Navigation() {
         composable(
             route = "teacher"
         ) {
-            ProfilePictureScreen {
-                navController.navigate("detail/${it}")
-
-            }
+            ProfilePictureScreen(navController)
         }
 
         composable(
             route = "detail/{name}",
             arguments = listOf(
-                navArgument("name") { 
+                navArgument("name") {
                     type = NavType.StringType
                 }
             )
         ) {
             backStackEntry ->
-            val name = backStackEntry.arguments?.getString("name") ?: ""
             DetailScreen()
         }
     }

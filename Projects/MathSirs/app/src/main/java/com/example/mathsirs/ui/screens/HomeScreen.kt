@@ -2,6 +2,7 @@ package com.example.mathsirs.ui.screens
 
 import android.R
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,14 +33,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.mathsirs.viewmodels.NameViewModel
 import com.example.mathsirs.viewmodels.ProfilePictureViewmodel
+import com.example.mathsirs.viewmodels.SelectionViewModel
+import java.net.URLEncoder
 
 
 @Composable
-fun ProfilePictureScreen(onClick: (name: String) -> Unit) {
-    
+fun ProfilePictureScreen(
+    navController: NavController,
+    selectionViewModel: SelectionViewModel = hiltViewModel()
+) {
     //here we will need to create a viewmodel object cuz to show the data in items
     val profilePictureViewmodel: ProfilePictureViewmodel = hiltViewModel() // this viewmodel method will create an object of ProfilePictureViewmodel and assign it to the variable
     val nameViewmodel: NameViewModel = hiltViewModel()
@@ -61,10 +67,16 @@ fun ProfilePictureScreen(onClick: (name: String) -> Unit) {
         ) {
             items(names.value.zip(profilePictures.value)) {
                 (name, profilePicture) ->
-                ProfilePicture(name, profilePicture, onClick)
-//                items(names.value.zip(profilePictures.value)) { (name, profilePicture) ->
-//                    ProfilePicture(name = name, profilePicture = profilePicture) { }
-//                }
+                ProfilePicture(name, profilePicture) {
+                    // first we save into SavedStateHandle
+                    selectionViewModel.selectTeacher(name, profilePicture)
+                    Log.d("Selection", "Selected teacher: $name with pic: $profilePicture")
+
+
+                    // navigate by just the key
+                    navController.navigate("detail/$name")
+                }
+
 
             }
         }

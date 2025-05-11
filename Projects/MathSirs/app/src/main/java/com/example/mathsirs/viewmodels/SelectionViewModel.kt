@@ -1,5 +1,6 @@
 package com.example.mathsirs.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.mathsirs.repo.TeacherRepo
@@ -7,7 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class SelectionViewModel @Inject constructor(private val teacherRepo: TeacherRepo,
+class SelectionViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle) : ViewModel() {
         // call this before navigation
         fun selectTeacher(name: String, profilePic: String) {
@@ -20,5 +21,9 @@ class SelectionViewModel @Inject constructor(private val teacherRepo: TeacherRep
         get() = savedStateHandle.get<String>("name") ?: ""
 
     val teacherProfilePicture: String
-        get() = savedStateHandle.get<String>("profilePicture") ?: ""
+        get() {
+            val pic = savedStateHandle.get<String>("profilePicture") ?: "pictest"
+            Log.d("Selection", "Profile picture from SavedStateHandle: $pic")
+            return pic
+        }
 }
