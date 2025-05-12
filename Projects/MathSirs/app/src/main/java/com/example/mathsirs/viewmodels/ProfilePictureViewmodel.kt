@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mathsirs.repo.TeacherRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -14,7 +15,7 @@ class ProfilePictureViewmodel @Inject constructor(private val teacherRepo: Teach
         get() = teacherRepo.profilePicture
 
     init {
-        viewModelScope.launch { 
+        viewModelScope.launch(Dispatchers.IO) {
             teacherRepo.getProfilePicture()
         }
     }
