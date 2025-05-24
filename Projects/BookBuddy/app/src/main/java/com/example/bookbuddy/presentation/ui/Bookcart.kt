@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
+import com.example.bookbuddy.presentation.allbooksbycategory.navigation.Routes
+import com.example.bookbuddy.presentation.effects.ImageAnimation
 
 @Composable
 fun Bookcart(
@@ -31,14 +33,14 @@ fun Bookcart(
     title: String = "title",
     author: String? = "author",
     des: String = "java ",
-    //navHostController: NavHostController,
-    bookUrl: String = "bookurl"
+    navHostController: NavHostController,
+    bookUrl: String
 ) {
     Card(
         modifier = Modifier.fillMaxWidth()
             .padding(8.dp)
             .clickable {
-                //navHostController.navigate("")
+                navHostController.navigate(Routes.ShowPdfScreen(url = bookUrl))
             }
     ) {
 
@@ -55,7 +57,7 @@ fun Bookcart(
                 modifier = Modifier.size(100.dp)
                     .clip(RoundedCornerShape(8.dp)),
                 loading = {
-                    // TODO imageani()
+                    ImageAnimation()
                 },
                 error = {
                     Text(text = "Error while loading image")
