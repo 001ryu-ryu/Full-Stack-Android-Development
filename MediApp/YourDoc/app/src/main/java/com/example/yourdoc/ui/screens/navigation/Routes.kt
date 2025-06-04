@@ -17,4 +17,7 @@ sealed class Routes {
 
     @Serializable
     data class WaitingRoute(val userID: String)
+
+    @Serializable
+    object HomeScreenRoute
 }

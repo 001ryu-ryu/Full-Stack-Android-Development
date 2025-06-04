@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.yourdoc.ui.screens.HomeScreen
 import com.example.yourdoc.ui.screens.LoginScreen
 import com.example.yourdoc.ui.screens.SignUp
 import com.example.yourdoc.ui.screens.WaitingScreen
@@ -26,9 +27,14 @@ fun NavApp(viewModel: MyViewModel) {
             LoginScreen(viewModel, navController)
         }
 
+
         composable<Routes.WaitingRoute> {
             val data = it.toRoute<Routes.WaitingRoute>()
-            WaitingScreen(data.userID, viewModel)
+            WaitingScreen(data.userID, viewModel, navController)
+        }
+
+        composable<Routes.HomeScreenRoute> {
+            HomeScreen()
         }
     }
 }
