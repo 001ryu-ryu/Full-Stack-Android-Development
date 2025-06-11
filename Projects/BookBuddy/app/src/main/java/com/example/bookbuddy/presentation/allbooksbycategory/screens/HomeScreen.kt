@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.MenuBook
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
@@ -40,8 +38,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.launch
 import com.example.bookbuddy.R
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +59,7 @@ fun HomeScreen(navHostController: NavHostController) {
                         .width(250.dp)
                         .padding(16.dp)
                 ) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    //Spacer(modifier = Modifier.height(16.dp))
                     HorizontalDivider()
                     NavigationDrawerItem(label = {
                         Text(text = "Home")
@@ -133,7 +131,6 @@ fun HomeScreen(navHostController: NavHostController) {
                     .fillMaxSize()
             ) {
                 TabScreen(navHostController)
-
             }
 
         }

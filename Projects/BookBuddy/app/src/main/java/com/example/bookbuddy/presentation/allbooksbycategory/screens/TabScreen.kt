@@ -2,12 +2,8 @@ package com.example.bookbuddy.presentation.allbooksbycategory.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -21,10 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 
@@ -42,7 +36,7 @@ fun TabScreen(navHostController: NavHostController) {
     )
 
     val pagerState = rememberPagerState(pageCount = {tabs.size})
-    val scope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -61,7 +55,7 @@ fun TabScreen(navHostController: NavHostController) {
                 Tab(
                     selected = pagerState.currentPage == index,
                     onClick = {
-                        scope.launch { 
+                        coroutineScope.launch {
                             pagerState.animateScrollToPage(index)
                         }
                     },
