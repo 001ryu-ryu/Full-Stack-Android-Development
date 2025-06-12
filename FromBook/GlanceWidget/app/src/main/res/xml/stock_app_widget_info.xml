@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialLayout="@layout/glance_default_loading_layout"
+    android:resizeMode="horizontal|vertical"
+    android:minHeight="50dp"
+    android:minWidth="100dp"
+    android:targetCellWidth="1"
+    android:targetCellHeight="2"
+    android:previewImage="@drawable/kira"
+    >
+
+</appwidget-provider>
