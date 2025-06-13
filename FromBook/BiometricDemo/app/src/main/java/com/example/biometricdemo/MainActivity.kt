@@ -39,7 +39,6 @@ class MainActivity : FragmentActivity() {
             BiometricDemoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     AuthenticationScreen(modifier = Modifier.padding(innerPadding))
-
                 }
             }
         }
