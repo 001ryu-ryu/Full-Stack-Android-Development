@@ -28,6 +28,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,7 +45,9 @@ import com.example.studysmart.R
 import com.example.studysmart.domain.model.Session
 import com.example.studysmart.domain.model.Subject
 import com.example.studysmart.domain.model.Task
+import com.example.studysmart.ui.components.AddSubjectDialog
 import com.example.studysmart.ui.components.CountCard
+import com.example.studysmart.ui.components.DeleteDialog
 import com.example.studysmart.ui.components.SubjectCard
 import com.example.studysmart.ui.components.studySessionList
 import com.example.studysmart.ui.components.tasksList
@@ -113,6 +120,50 @@ fun DashBoardScreen(modifier: Modifier = Modifier) {
             sessionId = 0
         )
     )
+
+    var isAddSubjectDialogOpen by rememberSaveable { mutableStateOf(false) }
+    var isDeleteSessionDialogOpen by rememberSaveable { mutableStateOf(false) }
+    var subjectName by remember { mutableStateOf("") }
+    var goalHours by remember { mutableStateOf("") }
+    var selectedColors by remember { mutableStateOf(Subject.subjectCardColors.random()) }
+
+    val onSubjectNameChange = {name: String ->
+        subjectName = name
+    }
+
+    val onGoalHoursChange = {hour: String ->
+        goalHours = hour
+    }
+
+    val onColorChange = {colors: List<Color> ->
+        selectedColors = colors
+    }
+
+    AddSubjectDialog(
+        isOpen = isAddSubjectDialogOpen,
+        onDismissRequest = { isAddSubjectDialogOpen = false },
+        onConfirmButton = {
+            isAddSubjectDialogOpen = false
+        },
+        selectedColors = selectedColors,
+        subjectName = subjectName,
+        goalHours = goalHours,
+        onColorChange = onColorChange,
+        onSubjectNameChange = onSubjectNameChange,
+        onGoalHoursChange = onGoalHoursChange,
+    )
+
+    DeleteDialog(
+        isOpen = isDeleteSessionDialogOpen,
+        title = "Delete Session",
+        bodyText = "Are you sure you don't want to keep track?",
+        onDismissRequest = {
+            isDeleteSessionDialogOpen = false
+        },
+        onConfirmButton = {
+            isDeleteSessionDialogOpen = false
+        }
+    )
     
     Scaffold(
         topBar = { TopBar() }
@@ -136,7 +187,10 @@ fun DashBoardScreen(modifier: Modifier = Modifier) {
 
             item { 
                 SubjectCardsSection(
-                    subjectList = subjects
+                    subjectList = subjects,
+                    onAddIconClick = {
+                        isAddSubjectDialogOpen = true
+                    }
                 )
             }
 
@@ -168,15 +222,11 @@ fun DashBoardScreen(modifier: Modifier = Modifier) {
                 emptyListText = "I see you haven't studied yet.\n START!!!",
                 sessions = sessions,
                 onDeleteIconClick = {
-
+                    isDeleteSessionDialogOpen = true
                 }
-                
             )
-
             }
-
         }
-
     }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -233,7 +283,8 @@ fun CountCardSection(modifier: Modifier = Modifier,
 @Composable
 fun SubjectCardsSection(
     subjectList: List<Subject>,
-    emptyListText: String = "You don't have any subjects yet. \n Add it!"
+    emptyListText: String = "You don't have any subjects yet. \n Add it!",
+    onAddIconClick: () -> Unit
 ) {
     val context = LocalContext.current
     Column { 
@@ -249,7 +300,8 @@ fun SubjectCardsSection(
             )
             IconButton(
                 onClick = {
-                    Toast.makeText(context, "Hehe, not yet!", Toast.LENGTH_LONG).show()
+                    onAddIconClick()
+
                 }
             ) {
                 Icon(

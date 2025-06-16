@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.studysmart.ui.dashboard.DashBoardScreen
+import com.example.studysmart.ui.subject.SubjectScreen
 import com.example.studysmart.ui.theme.StudySmartTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,7 +22,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             StudySmartTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    DashBoardScreen(Modifier.padding(innerPadding))
+                    SubjectScreen(Modifier.padding(innerPadding))
                 }
             }
         }
