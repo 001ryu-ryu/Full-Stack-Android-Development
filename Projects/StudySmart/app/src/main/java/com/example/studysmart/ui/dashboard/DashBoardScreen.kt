@@ -45,81 +45,56 @@ import com.example.studysmart.R
 import com.example.studysmart.domain.model.Session
 import com.example.studysmart.domain.model.Subject
 import com.example.studysmart.domain.model.Task
+import com.example.studysmart.sessions
+import com.example.studysmart.subjects
+import com.example.studysmart.tasks
 import com.example.studysmart.ui.components.AddSubjectDialog
 import com.example.studysmart.ui.components.CountCard
 import com.example.studysmart.ui.components.DeleteDialog
 import com.example.studysmart.ui.components.SubjectCard
 import com.example.studysmart.ui.components.studySessionList
 import com.example.studysmart.ui.components.tasksList
+import com.example.studysmart.ui.subject.SubjectScreenNavArg
+import com.example.studysmart.ui.task.TaskScreenNavArgs
 import com.example.studysmart.ui.theme.StudySmartTheme
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.SessionScreenRouteDestination
+import com.ramcosta.composedestinations.generated.destinations.SubjectScreenRouteDestination
+import com.ramcosta.composedestinations.generated.destinations.TaskScreenRouteDestination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+
+@Destination<RootGraph>(start = true)
+@Composable
+fun DashBoardScreenRoute(
+    navigator: DestinationsNavigator
+) {
+    DashBoardScreen(
+        onSubjectCardClick = {
+            it?.let {
+                val navArg = SubjectScreenNavArg(subjectId = it)
+                navigator.navigate(SubjectScreenRouteDestination(navArgs = navArg))
+            }
+        },
+        onTaskCardClick = {
+            val navArg = TaskScreenNavArgs(taskId = it, subjectId = null)
+            navigator.navigate(TaskScreenRouteDestination(navArg))
+        },
+        onStartSessionButtonClick = {
+            navigator.navigate(SessionScreenRouteDestination())
+        }
+    )
+}
+
 
 @Composable
-fun DashBoardScreen(modifier: Modifier = Modifier) {
-    val subjects = listOf(
-        Subject(name = "English", goalHours = 10f, colors = Subject.subjectCardColors[0], subjectId = 0),
-        Subject(name = "Math", goalHours = 10f, colors = Subject.subjectCardColors[1], subjectId = 1),
-        Subject(name = "Adv Math", goalHours = 10f, colors = Subject.subjectCardColors[2], subjectId = 2),
-        Subject(name = "Physics", goalHours = 10f, colors = Subject.subjectCardColors[3], subjectId = 3),
-        Subject(name = "Chemistry", goalHours = 10f, colors = Subject.subjectCardColors[4], subjectId = 4),
-    )
+fun DashBoardScreen(
+    onSubjectCardClick: (Int?) -> Unit,
+    onTaskCardClick: (Int?) -> Unit,
+    onStartSessionButtonClick: () -> Unit
+) {
 
-    val tasks = listOf(
-        Task(
-            title = "Prepare Notes",
-            description = "Desc",
-            dueDate = 0L,
-            priority = 1,
-            relatedToSubject = "Eng",
-            isComplete = false,
-            taskId = 0,
-            taskSubjectId = 4
-        ),
-        Task(
-            title = "Finishing Chapter 2",
-            description = "Desc",
-            dueDate = 0L,
-            priority = 2,
-            relatedToSubject = "Math",
-            isComplete = true,
-            taskId = 1,
-            taskSubjectId = 1
-        ),
-        Task(
-            title = "Finishing Chapter 3",
-            description = "Desc",
-            dueDate = 0L,
-            priority = 0,
-            relatedToSubject = "Math",
-            isComplete = true,
-            taskId = 2,
-            taskSubjectId = 1
-        )
 
-    )
-
-    val sessions = listOf<Session>(
-        Session(
-            sessionSubjectId = 1,
-            relatedToSubject = "English",
-            date = 12L,
-            duration = 8L,
-            sessionId = 0
-        ),
-        Session(
-            sessionSubjectId = 1,
-            relatedToSubject = "Mathematics",
-            date = 12L,
-            duration = 8L,
-            sessionId = 0
-        ),
-        Session(
-            sessionSubjectId = 1,
-            relatedToSubject = "Computer Science",
-            date = 12L,
-            duration = 8L,
-            sessionId = 0
-        )
-    )
 
     var isAddSubjectDialogOpen by rememberSaveable { mutableStateOf(false) }
     var isDeleteSessionDialogOpen by rememberSaveable { mutableStateOf(false) }
@@ -169,7 +144,7 @@ fun DashBoardScreen(modifier: Modifier = Modifier) {
         topBar = { TopBar() }
     ) {
         LazyColumn(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
         )
@@ -190,16 +165,18 @@ fun DashBoardScreen(modifier: Modifier = Modifier) {
                     subjectList = subjects,
                     onAddIconClick = {
                         isAddSubjectDialogOpen = true
-                    }
+                    },
+                    onSubjectCardClick = onSubjectCardClick
                 )
             }
 
             item {
                 Button(
                     onClick = {
-                        
+                        onStartSessionButtonClick()
                     },
-                    modifier = modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(horizontal = 48.dp, vertical = 20.dp)
                 ) {
                     Text("Start Study Session!")
@@ -210,7 +187,7 @@ fun DashBoardScreen(modifier: Modifier = Modifier) {
                 sectionTitle = "UPCOMING TASKS",
                 tasks = tasks,
                 onCheckBoxClick = {},
-                onTaskCardClick = {}
+                onTaskCardClick = onTaskCardClick
             )
 
             item {
@@ -284,7 +261,8 @@ fun CountCardSection(modifier: Modifier = Modifier,
 fun SubjectCardsSection(
     subjectList: List<Subject>,
     emptyListText: String = "You don't have any subjects yet. \n Add it!",
-    onAddIconClick: () -> Unit
+    onAddIconClick: () -> Unit,
+    onSubjectCardClick: (Int?) -> Unit
 ) {
     val context = LocalContext.current
     Column { 
@@ -338,7 +316,7 @@ fun SubjectCardsSection(
                     subjectName = subject.name,
                     gradientColors = subject.colors
                 ) {
-                    Toast.makeText(context, "Not yet Bro!!", Toast.LENGTH_LONG).show()
+                    onSubjectCardClick(subject.subjectId)
                 }
             }
         }

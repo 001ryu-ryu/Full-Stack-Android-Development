@@ -1,14 +1,18 @@
 package com.example.studysmart.domain.model
 
 import androidx.compose.ui.graphics.Color
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.example.studysmart.ui.theme.gradient1
 import com.example.studysmart.ui.theme.gradient2
 import com.example.studysmart.ui.theme.gradient3
 import com.example.studysmart.ui.theme.gradient4
 import com.example.studysmart.ui.theme.gradient5
 
+@Entity
 data class Subject(
-    val subjectId: Int,
+    @PrimaryKey(autoGenerate = true)
+    val subjectId: Int?,
     val name: String,
     val goalHours: Float,
     val colors: List<Color>

@@ -1,7 +1,12 @@
 package com.example.studysmart.domain.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity
 data class Task(
-    val taskId: Int,
+    @PrimaryKey(autoGenerate = true)
+    val taskId: Int?,
     val taskSubjectId: Int,
     val title: String,
     val description: String,
