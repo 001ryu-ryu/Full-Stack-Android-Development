@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import com.example.studysmart.domain.model.Session
 import com.example.studysmart.domain.model.Subject
 import com.example.studysmart.domain.model.Task
@@ -18,7 +19,9 @@ import com.example.studysmart.ui.task.TaskScreen
 import com.example.studysmart.ui.theme.StudySmartTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,12 +37,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 val subjects = listOf(
-    Subject(name = "English", goalHours = 16f, colors = Subject.subjectCardColors[0], subjectId = 0),
-    Subject(name = "Math", goalHours = 19f, colors = Subject.subjectCardColors[1], subjectId = 1),
-    Subject(name = "Adv Math", goalHours = 10f, colors = Subject.subjectCardColors[2], subjectId = 2),
-    Subject(name = "Physics", goalHours = 10f, colors = Subject.subjectCardColors[3], subjectId = 3),
-    Subject(name = "Chemistry", goalHours = 10f, colors = Subject.subjectCardColors[4], subjectId = 4),
-    Subject(name = "Chemistry", goalHours = 10f, colors = Subject.subjectCardColors[4], subjectId = 4),
+    Subject(name = "English", goalHours = 16f, colors = Subject.subjectCardColors[0].map { it.toArgb() }, subjectId = 0),
+    Subject(name = "Math", goalHours = 19f, colors = Subject.subjectCardColors[1].map { it.toArgb() }, subjectId = 1),
+    Subject(name = "Adv Math", goalHours = 10f, colors = Subject.subjectCardColors[2].map { it.toArgb() }, subjectId = 2),
+    Subject(name = "Physics", goalHours = 10f, colors = Subject.subjectCardColors[3].map { it.toArgb() }, subjectId = 3),
+    Subject(name = "Chemistry", goalHours = 10f, colors = Subject.subjectCardColors[4].map { it.toArgb() }, subjectId = 4),
+    Subject(name = "Chemistry", goalHours = 10f, colors = Subject.subjectCardColors[4].map { it.toArgb() }, subjectId = 4),
 )
 
 val tasks = listOf(
