@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+    id("kotlinx-serialization")
 }
 
 android {
@@ -30,13 +32,29 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.material3)
+
+    //ktor
+    implementation("io.ktor:ktor-client-core:3.1.3")
+    implementation("io.ktor:ktor-client-okhttp:3.1.3")
+    implementation("io.ktor:ktor-client-content-negotiation:3.1.3")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:3.1.3")
+    implementation("io.ktor:ktor-client-logging:3.1.3")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
