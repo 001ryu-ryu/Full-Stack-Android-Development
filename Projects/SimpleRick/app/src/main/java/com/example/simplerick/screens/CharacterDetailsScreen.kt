@@ -2,8 +2,6 @@ package com.example.simplerick.screens
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,19 +29,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import com.example.network.KtorClient
 import com.example.network.models.domain.Character
 import com.example.simplerick.components.character.CharacterDetailsNamePlateComponent
 import com.example.simplerick.components.character.DataPoint
 import com.example.simplerick.components.character.DataPointComponent
+import kotlinx.coroutines.delay
 
 @Composable
 fun CharacterDetailsScreen(
     ktorClient: KtorClient,
     characterId: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (Int) -> Unit
 ) {
     var character by remember { mutableStateOf<Character?>(null) }
 
@@ -67,7 +65,14 @@ fun CharacterDetailsScreen(
     }
 
     LaunchedEffect(Unit) {
-        character = ktorClient.getCharacter(characterId)
+        delay(500)
+        ktorClient
+            .getCharacter(characterId)
+            .onSuccess {
+                character = it
+            }.onFailure {
+                // todo handle exception
+            }
     }
 
     LazyColumn(
@@ -132,7 +137,7 @@ fun CharacterDetailsScreen(
                             shape = RoundedCornerShape(12.dp)
                         )
                         .clip(RoundedCornerShape(12.dp))
-                        .clickable(onClick = {})
+                        .clickable(onClick = {onClick(characterId)})
                         .padding(vertical = 8.dp, horizontal = 32.dp)
                 )
             }
