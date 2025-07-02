@@ -9,6 +9,6 @@ data class Contact(
     val id: Int = 0,
     val name: String,
     val phoneNumber: String,
-    val email: String,
+    val email: String? = null,
     val image: ByteArray? = null
 )

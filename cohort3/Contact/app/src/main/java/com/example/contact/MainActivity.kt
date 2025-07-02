@@ -11,8 +11,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.contact.ui.navigation.NavApp
+import com.example.contact.ui.screen.AddContactScreen
 import com.example.contact.ui.theme.ContactTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,7 +24,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             ContactTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
+                    NavApp()
+//                    AddContactScreen()
                 }
             }
         }

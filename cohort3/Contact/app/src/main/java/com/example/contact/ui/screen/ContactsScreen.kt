@@ -2,26 +2,72 @@ package com.example.contact.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.contact.model.database.Contact
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import com.example.contact.ui.navigation.Routes
+import com.example.contact.viewmodel.MyViewModel
 
 @Composable
-fun ContactCard() {
+fun ContactsScreen(modifier: Modifier = Modifier, viewModel: MyViewModel = hiltViewModel(), navHostController: NavHostController) {
+    val contacts = viewModel.contacts.collectAsState()
+
+    Scaffold(
+        floatingActionButton = {
+            AddContactButton {
+               navHostController.navigate(Routes.AddContact)
+            }
+        }
+    ) {innerPadding ->
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            items(contacts.value) {
+                ContactCard(
+                    name = it.name,
+                    phoneNumber = it.phoneNumber.toString(),
+                    onDeleteClick = {
+                        viewModel.deleteContact(it)
+                    }
+                )
+                Spacer(Modifier.height(5.dp))
+            }
+        }
+    }
+
+}
+
+@Composable
+fun ContactCard(
+    name: String,
+    phoneNumber: String,
+    onDeleteClick: () -> Unit,
+    onCallClick: () -> Unit = {}
+) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth()
+            .padding(horizontal = 8.dp)
     ) {
         Row(
             modifier = Modifier
@@ -29,28 +75,39 @@ fun ContactCard() {
                 .padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "Name")
-            IconButton(
-                onClick = {
-                    // todo delete contact
+            Text(text = name,
+                modifier = Modifier.padding(horizontal = 12.dp)
+                    .padding(top = 10.dp))
+            Row {
+                IconButton(
+                    onClick = onCallClick
+                ) {
+                    Icon(imageVector = Icons.Default.Call, contentDescription = null)
                 }
-            ) {
-                Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                IconButton(
+                    onClick = onDeleteClick
+                ) {
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                }
             }
+
         }
 
-        Text("Phone Number",
-            modifier = Modifier.padding(horizontal = 8.dp))
+        Text(phoneNumber,
+            modifier = Modifier.padding(horizontal = 20.dp)
+                .padding(bottom = 10.dp))
 
     }
 }
 
-@Preview
 @Composable
-fun Prev() {
-    ContactCard()
+fun AddContactButton(onClick: () -> Unit) {
+    IconButton(
+        onClick = onClick
+    ) {
+        Icon(imageVector = Icons.Default.AddCircle, contentDescription = null)
+    }
 }
-
 
 
 
