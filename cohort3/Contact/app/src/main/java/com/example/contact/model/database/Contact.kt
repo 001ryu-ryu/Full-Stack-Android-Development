@@ -10,5 +10,5 @@ data class Contact(
     val name: String,
     val phoneNumber: String,
     val email: String? = null,
-    val image: ByteArray? = null
+    val image: ByteArray
 )

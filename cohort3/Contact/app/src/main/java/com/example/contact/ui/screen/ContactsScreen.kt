@@ -1,12 +1,17 @@
 package com.example.contact.ui.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -20,10 +25,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImage
+import com.example.contact.R
 import com.example.contact.ui.navigation.Routes
 import com.example.contact.viewmodel.MyViewModel
 
@@ -45,6 +54,7 @@ fun ContactsScreen(modifier: Modifier = Modifier, viewModel: MyViewModel = hiltV
         ) {
             items(contacts.value) {
                 ContactCard(
+                    image = it.image,
                     name = it.name,
                     phoneNumber = it.phoneNumber.toString(),
                     onDeleteClick = {
@@ -60,6 +70,7 @@ fun ContactsScreen(modifier: Modifier = Modifier, viewModel: MyViewModel = hiltV
 
 @Composable
 fun ContactCard(
+    image: ByteArray,
     name: String,
     phoneNumber: String,
     onDeleteClick: () -> Unit,
@@ -70,32 +81,59 @@ fun ContactCard(
             .padding(horizontal = 8.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = name,
-                modifier = Modifier.padding(horizontal = 12.dp)
-                    .padding(top = 10.dp))
-            Row {
-                IconButton(
-                    onClick = onCallClick
-                ) {
-                    Icon(imageVector = Icons.Default.Call, contentDescription = null)
+            Box(
+                modifier = Modifier.size(60.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (image.contentEquals("".toByteArray())) {
+                    Image(
+                        painter = painterResource(id = R.drawable.default_image),
+                        contentDescription = null,
+                        modifier = Modifier.size(60.dp)
+                    )
+                } else {
+                    AsyncImage(
+                        model = image,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxWidth(1f).aspectRatio(1f)
+                    )
                 }
-                IconButton(
-                    onClick = onDeleteClick
+
+            }
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                    Text(text = name,
+                        modifier = Modifier.padding(horizontal = 12.dp)
+                            .padding(top = 10.dp))
+                    Row {
+                        IconButton(
+                            onClick = onCallClick
+                        ) {
+                            Icon(imageVector = Icons.Default.Call, contentDescription = null)
+                        }
+                        IconButton(
+                            onClick = onDeleteClick
+                        ) {
+                            Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                        }
+                    }
+
                 }
+
+                Text(phoneNumber,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                        .padding(bottom = 10.dp))
+
             }
 
         }
-
-        Text(phoneNumber,
-            modifier = Modifier.padding(horizontal = 20.dp)
-                .padding(bottom = 10.dp))
 
     }
 }

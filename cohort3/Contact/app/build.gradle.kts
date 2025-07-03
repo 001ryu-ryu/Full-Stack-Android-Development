@@ -60,6 +60,8 @@ dependencies {
     implementation("androidx.navigation:navigation-runtime-ktx:2.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
 
+    implementation("io.coil-kt.coil3:coil-compose:3.2.0")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
