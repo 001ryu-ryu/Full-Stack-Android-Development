@@ -1,5 +1,7 @@
 package com.example.contact.ui.screen
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -40,7 +42,10 @@ import coil3.compose.AsyncImage
 import com.example.contact.R
 import com.example.contact.components.NavigateBackTopBar
 import com.example.contact.model.database.Contact
+import com.example.contact.utils.Utils
 import com.example.contact.viewmodel.MyViewModel
+import java.io.ByteArrayOutputStream
+import java.io.IOException
 
 @Composable
 fun AddContactScreen(
@@ -109,7 +114,7 @@ fun AddContactScreen(
                     Contact(
                         name = name,
                         phoneNumber = phoneNumber,
-                        image = image
+                        image = Utils.compressImage(image) ?: "".toByteArray()
                     )
                 )
                 navHostController.popBackStack()
@@ -198,7 +203,6 @@ fun AddField(
         }
     }
 }
-
 
 
 
