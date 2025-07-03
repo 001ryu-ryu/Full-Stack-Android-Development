@@ -1,6 +1,7 @@
 package com.example.contact.ui.screen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,7 +60,8 @@ fun ContactsScreen(modifier: Modifier = Modifier, viewModel: MyViewModel = hiltV
                     phoneNumber = it.phoneNumber.toString(),
                     onDeleteClick = {
                         viewModel.deleteContact(it)
-                    }
+                    },
+                    onCardClick = {navHostController.navigate(Routes.IndividualContact(it.id))}
                 )
                 Spacer(Modifier.height(5.dp))
             }
@@ -74,11 +76,15 @@ fun ContactCard(
     name: String,
     phoneNumber: String,
     onDeleteClick: () -> Unit,
-    onCallClick: () -> Unit = {}
+    onCallClick: () -> Unit = {},
+    onCardClick: () -> Unit
 ) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth()
             .padding(horizontal = 8.dp)
+            .clickable(
+                onClick = onCardClick
+            )
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()

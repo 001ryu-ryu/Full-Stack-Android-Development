@@ -8,4 +8,7 @@ sealed class Routes {
 
     @Serializable
     object AddContact
+
+    @Serializable
+    data class IndividualContact(val contactId: Int)
 }

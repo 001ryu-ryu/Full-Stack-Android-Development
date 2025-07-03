@@ -16,6 +16,9 @@ class MyViewModel @Inject constructor(private val contactDatabase: ContactDataba
     private val _contacts = MutableStateFlow<List<Contact>>(emptyList())
     val contacts = _contacts.asStateFlow()
 
+    private val _individualContact = MutableStateFlow<Contact?>(null)
+    val individualContact = _individualContact.asStateFlow()
+
     init {
         getAllContacts()
     }
@@ -37,6 +40,13 @@ class MyViewModel @Inject constructor(private val contactDatabase: ContactDataba
     fun deleteContact(contact: Contact) {
         viewModelScope.launch {
             contactDatabase.getDao().deleteContact(contact)
+        }
+    }
+
+    fun getIndividualContact(id: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val contact = contactDatabase.getDao().getIndividualContact(id)
+            _individualContact.value = contact
         }
     }
 }

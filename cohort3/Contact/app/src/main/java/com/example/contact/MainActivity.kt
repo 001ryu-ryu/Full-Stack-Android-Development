@@ -1,5 +1,6 @@
 package com.example.contact
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,9 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.contact.ui.navigation.NavApp
 import com.example.contact.ui.screen.AddContactScreen
+import com.example.contact.ui.screen.ContactDetailsScreen
 import com.example.contact.ui.theme.ContactTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,9 +26,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ContactTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(modifier = Modifier.fillMaxSize()) {  innerPadding ->
                     NavApp()
-//                    AddContactScreen()
+//                    ContactDetailsScreen(contactId = 2)
                 }
             }
         }

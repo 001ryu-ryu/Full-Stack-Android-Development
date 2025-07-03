@@ -16,4 +16,7 @@ interface ContactDao {
 
     @Query("SELECT * FROM contact_table ORDER BY name ASC")
     fun getAllContacts(): Flow<List<Contact>>
+
+    @Query("SELECT * FROM contact_table WHERE id = :id")
+    suspend fun getIndividualContact(id: Int): Contact
 }
