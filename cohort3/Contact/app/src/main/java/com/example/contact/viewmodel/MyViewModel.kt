@@ -37,6 +37,12 @@ class MyViewModel @Inject constructor(private val contactDatabase: ContactDataba
         }
     }
 
+    fun updateContact(contact: Contact) {
+        viewModelScope.launch(Dispatchers.IO) {
+            contactDatabase.getDao().updateContact(contact)
+        }
+    }
+
     fun deleteContact(contact: Contact) {
         viewModelScope.launch {
             contactDatabase.getDao().deleteContact(contact)
@@ -47,6 +53,12 @@ class MyViewModel @Inject constructor(private val contactDatabase: ContactDataba
         viewModelScope.launch(Dispatchers.IO) {
             val contact = contactDatabase.getDao().getIndividualContact(id)
             _individualContact.value = contact
+        }
+    }
+
+    fun setFavorite(isFavorite: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _individualContact.value?.isFavourite = isFavorite
         }
     }
 }

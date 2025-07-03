@@ -3,6 +3,7 @@ package com.example.contact.model.database
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
+import androidx.room.Update
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
@@ -19,4 +20,7 @@ interface ContactDao {
 
     @Query("SELECT * FROM contact_table WHERE id = :id")
     suspend fun getIndividualContact(id: Int): Contact
+
+    @Update
+    suspend fun updateContact(contact: Contact)
 }

@@ -19,6 +19,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +28,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -34,12 +40,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.example.contact.R
+import com.example.contact.model.database.Contact
 import com.example.contact.ui.navigation.Routes
 import com.example.contact.viewmodel.MyViewModel
 
 @Composable
 fun ContactsScreen(modifier: Modifier = Modifier, viewModel: MyViewModel = hiltViewModel(), navHostController: NavHostController) {
     val contacts = viewModel.contacts.collectAsState()
+
+    var isFavorite by remember { mutableStateOf(false) }
 
     Scaffold(
         floatingActionButton = {
@@ -57,7 +66,47 @@ fun ContactsScreen(modifier: Modifier = Modifier, viewModel: MyViewModel = hiltV
                 ContactCard(
                     image = it.image,
                     name = it.name,
-                    phoneNumber = it.phoneNumber.toString(),
+                    phoneNumber = it.phoneNumber,
+                    FavoriteIcon = {
+                        IconButton(
+                            onClick = {
+                                if (!isFavorite) {
+                                    isFavorite = true
+                                    viewModel.updateContact(
+                                        Contact(
+                                            name = it.name,
+                                            phoneNumber = it.phoneNumber,
+                                            image = it.image,
+                                            isFavourite = true
+                                        )
+                                    )
+                                } else {
+                                    isFavorite = false
+                                    viewModel.updateContact(
+                                        Contact(
+                                            name = it.name,
+                                            phoneNumber = it.phoneNumber,
+                                            image = it.image,
+                                            isFavourite = false
+                                        )
+                                    )
+                                }
+                            }
+                        ) {
+                            if (isFavorite) {
+                                Icon(
+                                    imageVector = Icons.Default.Favorite,
+                                    contentDescription = null
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.FavoriteBorder,
+                                    contentDescription = null
+                                )
+                            }
+
+                        }
+                    },
                     onDeleteClick = {
                         viewModel.deleteContact(it)
                     },
@@ -75,6 +124,7 @@ fun ContactCard(
     image: ByteArray,
     name: String,
     phoneNumber: String,
+    FavoriteIcon: @Composable () -> Unit,
     onDeleteClick: () -> Unit,
     onCallClick: () -> Unit = {},
     onCardClick: () -> Unit
@@ -124,6 +174,7 @@ fun ContactCard(
                         ) {
                             Icon(imageVector = Icons.Default.Call, contentDescription = null)
                         }
+                        FavoriteIcon()
                         IconButton(
                             onClick = onDeleteClick
                         ) {
