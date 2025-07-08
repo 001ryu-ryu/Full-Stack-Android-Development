@@ -11,5 +11,5 @@ data class Contact(
     val phoneNumber: String,
     val email: String? = null,
     val image: ByteArray,
-    var isFavourite: Boolean = false
+    var isFavourite: Boolean? = null
 )

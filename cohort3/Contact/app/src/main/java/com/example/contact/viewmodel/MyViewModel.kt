@@ -55,12 +55,6 @@ class MyViewModel @Inject constructor(private val contactDatabase: ContactDataba
             _individualContact.value = contact
         }
     }
-
-    fun setFavorite(isFavorite: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _individualContact.value?.isFavourite = isFavorite
-        }
-    }
 }
 
 
