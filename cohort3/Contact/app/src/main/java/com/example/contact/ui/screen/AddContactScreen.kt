@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.OutlinedTextField
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,11 +44,33 @@ fun AddContactScreen(
     viewModel: MyViewModel = hiltViewModel(), navHostController: NavHostController
 ) {
     val context = LocalContext.current
-    var name by rememberSaveable { mutableStateOf("") }
-    var phoneNumber by rememberSaveable { mutableStateOf("") }
+    var name by rememberSaveable { mutableStateOf<String?>(null) }
+    var phoneNumber by rememberSaveable { mutableStateOf<String?>(null) }
     var email by rememberSaveable { mutableStateOf<String?>(null) }
     var image by rememberSaveable { mutableStateOf<ByteArray>("".toByteArray()) }
     var imageUri by remember { mutableStateOf<Uri>("".toUri()) }
+
+    var nameError by remember { mutableStateOf<String?>(null) }
+    var phoneNumberError by remember { mutableStateOf<String?>(null) }
+
+    nameError = name?.let {
+        when {
+            it.isBlank() -> "I think the person obviously has a name!"
+            it.length <= 2 -> "Who have less than or 2 characters in their name?"
+            it.length > 10 -> "You aren't gonna remember this long name, make it short."
+            else -> null
+        }
+    }
+
+    phoneNumberError = phoneNumber?.let {
+        when {
+            it.isBlank() -> "You need a number to make call!"
+            it.length == 1 -> "I said a number, not a digit"
+            it.length <= 4 ->"Are you thinking to store some secret pin?"
+            it.length > 15 -> "I bet this is not a contact number!"
+            else -> null
+        }
+    }
 
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -72,9 +96,6 @@ fun AddContactScreen(
     val onEmailChange = { enteredEmail: String? ->
         email = enteredEmail
     }
-
-
-    var isButtonEnabled by rememberSaveable { mutableStateOf(false) }
 
 //    val isButtonEnabledEvent = {isEnabled: Boolean ->
 //        isButtonEnabled = isEnabled
@@ -122,29 +143,41 @@ fun AddContactScreen(
                 Spacer(Modifier.height(5.dp))
                 CustomTextField(
                     title = "Enter name",
-                    textState = name
+                    textState = name ?: "",
+                    errorState = nameError != null && name?.isNotBlank() == true,
+                    supportingText = {
+                        Text(nameError.orEmpty())
+                    }
                 ) { name ->
                     onNameChange(name)
                 }
                 CustomTextField(
                     title = "Enter phone number",
-                    textState = phoneNumber
+                    textState = phoneNumber?: "",
+                    errorState = phoneNumberError != null && phoneNumber?.isNotBlank() == true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    supportingText = {
+                        Text(phoneNumberError.orEmpty())
+                    }
                 ) { phone ->
                     onPhoneNumberChange(phone)
                 }
                 CustomTextField(
                     title = "Enter email (optional)",
-                    textState = if (email!=null) email!! else ""
+                    textState = if (email!=null) email!! else "",
+                    errorState = false,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 ) { email ->
                     onEmailChange(email)
                 }
 
                 ElevatedButton(
+                    enabled = !(!nameError.isNullOrBlank() || !phoneNumberError.isNullOrBlank()),
                     onClick = {
                         viewModel.addContact(
                             Contact(
-                                name = name,
-                                phoneNumber = phoneNumber,
+                                name = name!!,
+                                phoneNumber = phoneNumber!!,
                                 email = email,
                                 image = Utils.compressImage(image) ?: "".toByteArray()
                             )
@@ -165,13 +198,18 @@ fun AddContactScreen(
 fun CustomTextField(
     title: String,
     textState: String,
-    onValueChange: (String) -> Unit
-
+    errorState: Boolean,
+    supportingText: @Composable () -> Unit = {},
+    keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Unspecified),
+    onValueChange: (String) -> Unit,
 ) {
     OutlinedTextField(
         value = textState,
         label = {Text(title)},
-        onValueChange = {onValueChange(it)}
+        onValueChange = {onValueChange(it)},
+        isError = errorState,
+        supportingText = supportingText,
+        keyboardOptions = keyboardOptions
     )
 }
 
