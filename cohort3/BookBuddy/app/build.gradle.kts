@@ -45,6 +45,13 @@ android {
 
 dependencies {
 
+    //Room
+    val room_version = "2.7.2"
+
+    implementation("androidx.room:room-runtime:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+
     //Hilt
     implementation("com.google.dagger:hilt-android:2.56.2")
     implementation(libs.firebase.database)
@@ -55,7 +62,12 @@ dependencies {
     implementation("androidx.navigation:navigation-runtime-ktx:2.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
 
-    implementation("io.coil-kt.coil3:coil-compose:3.2.0")
+//    implementation("io.coil-kt.coil3:coil-compose:3.2.0")
+    implementation("io.coil-kt:coil-compose:2.7.0") // or latest
+
+
+    // extended icon package
+    implementation("androidx.compose.material:material-icons-extended")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
