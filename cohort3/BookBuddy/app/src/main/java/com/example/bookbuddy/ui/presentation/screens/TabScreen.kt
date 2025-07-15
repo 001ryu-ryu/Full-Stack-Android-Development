@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import com.example.bookbuddy.components.BookItem
+import com.example.bookbuddy.components.BooksList
 import com.example.bookbuddy.components.CategoriesTab
 import com.example.bookbuddy.ui.navigation.Routes
 import kotlinx.coroutines.launch
@@ -81,7 +82,7 @@ fun TabScreen(modifier: Modifier = Modifier, navHostController: NavHostControlle
         ) {page ->
             when(page) {
                 0 -> CategoriesTab {navHostController.navigate(Routes.CategoriesOfBookScreen(it))}
-                1 -> BookItem {  }
+                1 -> BooksList() {}
             }
         }
     }
