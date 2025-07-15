@@ -1,10 +1,11 @@
 package com.example.bookbuddy.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookbuddy.common.ResultState
-import com.example.bookbuddy.data.model.Book
-import com.example.bookbuddy.domain.repository.BookRepository
+import com.example.bookbuddy.data.model.BookCategory
+import com.example.bookbuddy.domain.repository.CategoriesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,36 +14,31 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class BookViewModel @Inject constructor(private val bookRepository: BookRepository) : ViewModel() {
-    private val _booksState = MutableStateFlow<BookResultState?>(null)
-    val booksState = _booksState.asStateFlow()
+class CategoriesViewModel @Inject constructor(private val categoriesRepository: CategoriesRepository) : ViewModel() {
+    private val _catState = MutableStateFlow(CatResultState())
+    val catState = _catState.asStateFlow()
 
     init {
-        getAllBooks()
+        getAllCategories()
     }
-    fun getAllBooks() {
+    fun getAllCategories() {
         viewModelScope.launch(Dispatchers.IO) {
-            bookRepository.getAllTasks().collect {
+            categoriesRepository.getBooksCategories().collect {
                 when(it) {
                     is ResultState.Failure -> {
-                        _booksState.value = BookResultState(
-                            isLoading = false,
-                            success = emptyList(),
+                        _catState.value = _catState.value.copy(
                             error = it.error
                         )
                     }
                     is ResultState.Loading -> {
-                        _booksState.value = BookResultState(
-                            isLoading = true,
-                            success = emptyList(),
-                            error = null
+                        _catState.value = _catState.value.copy(
+                            isLoading = true
                         )
                     }
                     is ResultState.Success -> {
-                        _booksState.value = BookResultState(
+                        _catState.value = _catState.value.copy(
                             isLoading = false,
-                            success = it.data,
-                            error = null
+                            success = it.data
                         )
                     }
                 }
@@ -51,15 +47,11 @@ class BookViewModel @Inject constructor(private val bookRepository: BookReposito
     }
 }
 
-data class BookResultState(
+data class CatResultState(
     val isLoading: Boolean = false,
-    val success: List<Book> = emptyList(),
+    val success: List<BookCategory> = emptyList(),
     val error: Exception? = null
 )
-
-
-
-
 
 
 

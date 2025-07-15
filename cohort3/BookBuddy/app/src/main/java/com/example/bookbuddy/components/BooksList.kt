@@ -65,6 +65,16 @@ fun BooksList(
                     }
                 }
             }
+
+            bookResultState.error != null -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text("Error: ${bookResultState.error.message}")
+                }
+            }
         }
     }
 }

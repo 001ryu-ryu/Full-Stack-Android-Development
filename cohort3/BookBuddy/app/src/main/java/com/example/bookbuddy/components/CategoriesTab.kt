@@ -1,5 +1,6 @@
 package com.example.bookbuddy.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,44 +31,50 @@ import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import com.example.bookbuddy.data.model.BookCategory
 import com.example.bookbuddy.ui.viewmodel.BookViewModel
+import com.example.bookbuddy.ui.viewmodel.CategoriesViewModel
 
 @Composable
 fun CategoriesTab(
+    categoriesViewModel: CategoriesViewModel = hiltViewModel(),
     onClick: (String) -> Unit
 ) {
-    val categoryList = listOf(
-        BookCategory(
-            categoryName = "Java",
-            categoryImageUrl = "https://t3.ftcdn.net/jpg/04/51/12/88/360_F_451128839_vmKOyil368UoXcac46W7aaqelTtLuNFk.jpg"
-        ),
-        BookCategory(
-            categoryName = "Android",
-            categoryImageUrl = "https://i.pinimg.com/736x/15/13/0d/15130d602f33418c678cc32b017f5997.jpg"
-        ),
-        BookCategory(
-            categoryName = "Quantum Physics",
-            categoryImageUrl = "https://www.thebrighterside.news/uploads/2025/01/qua-1.webp?format=auto&optimize=high&width=1440"
-        ),
-        BookCategory(
-            categoryName = "Artificial Intelligence",
-            categoryImageUrl = "https://urbeuniversity.edu/post_assets/Le9zsr8bQmv7gmZW40UXiVaPsGcpVwaY65mw28tU.webp"
-        ),
+    val catState = categoriesViewModel.catState.collectAsState()
+    when {
+        catState.value.isLoading -> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Loader()
+            }
+        }
 
+        catState.value.success.isNotEmpty() -> {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                contentPadding = PaddingValues(10.dp)
+            ) {
+                items(catState.value.success) { category ->
+                    CategoriesItem(
+                        category = category.categoryName,
+                        categoryImage = category.categoryImageUrl,
+                        onClick = { onClick(category.categoryName) })
+                }
+            }
+        }
 
-
-        )
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        contentPadding = PaddingValues(10.dp)
-    ) {
-        items(categoryList) { category ->
-            CategoriesItem(
-                category = category.categoryName,
-                categoryImage = category.categoryImageUrl,
-                onClick = { onClick(category.categoryName) })
+        catState.value.error != null -> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text("Error: ${catState.value.error}")
+            }
         }
     }
 }
@@ -103,13 +110,14 @@ private fun CategoriesItem(
                 )
             }
             Spacer(Modifier.height(5.dp))
-            Text(text = category,
+            Text(
+                text = category,
                 modifier = Modifier.padding(8.dp),
                 style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center)
+                textAlign = TextAlign.Center
+            )
         }
     }
-
 }
 
 
