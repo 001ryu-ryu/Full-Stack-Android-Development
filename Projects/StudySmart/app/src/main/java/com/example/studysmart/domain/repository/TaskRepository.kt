@@ -21,4 +21,5 @@ interface TaskRepository {
 
 
     fun getAllTasks(): Flow<List<Task>>
+    fun getAllUpcomingTasks(): Flow<List<Task>>
 }

@@ -19,6 +19,10 @@ class SessionRepositoryImpl @Inject constructor(private val sessionDao: SessionD
         TODO("Not yet implemented")
     }
 
+    override fun getRecentFiveSessions(): Flow<List<Session>> {
+        sessionDao.getAllSessions()
+    }
+
     override fun getTotalSessionDuration(): Flow<Long> {
         return sessionDao.getTotalSessionDuration()
     }

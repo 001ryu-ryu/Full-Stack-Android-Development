@@ -46,14 +46,14 @@ fun AddSubjectDialog(
     onDismissRequest: () -> Unit,
     onConfirmButton: () -> Unit
 ) {
-    
+
     var subjectNameError by remember { mutableStateOf<String?>(null) }
     var goalHoursError by remember { mutableStateOf<String?>(null) }
 
     subjectNameError = when {
         subjectName.isBlank() -> "You need to add Subject to Study!"
         subjectName.length <= 2 -> "I can't think of a Subject which has less than 3 letters!"
-        subjectName.length >20 -> "Wow, what kind of Subject has more than 20 letters in it!"
+        subjectName.length > 20 -> "Wow, what kind of Subject has more than 20 letters in it!"
         else -> null
     }
 
@@ -64,80 +64,68 @@ fun AddSubjectDialog(
         goalHours.toFloat() > 15f -> "It would be awesome if you could study for too long in a day!"
         else -> null
     }
-    
+
     if (isOpen) {
-        AlertDialog(
-            onDismissRequest = {
-
-                onDismissRequest()
-            },
-            title = {
-
-                Text(title)
-            },
-            text = {
-                Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        Subject.subjectCardColors.forEach { 
-                            colors ->
-                            Box(modifier = Modifier
+        AlertDialog(onDismissRequest = {
+            onDismissRequest()
+        }, title = {
+            Text(title)
+        }, text = {
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    Subject.subjectCardColors.forEach { colors ->
+                        Box(
+                            modifier = Modifier
                                 .size(24.dp)
                                 .clip(CircleShape)
                                 .border(
                                     width = 1.dp, color = if (colors == selectedColors) {
                                         Color.Black
-                                    } else Color.Transparent,
-                                    shape = CircleShape
+                                    } else Color.Transparent, shape = CircleShape
                                 )
                                 .background(brush = Brush.verticalGradient(colors))
-                                .clickable {onColorChange(colors)}) {
-
-                            }
-                        }
-
+                                .clickable { onColorChange(colors) }) {}
                     }
-                    OutlinedTextField(
-                        value = subjectName,
-                        onValueChange = {
-                            onSubjectNameChange(it)
-                        },
-                        label = {Text("Subject Name")},
-                        singleLine = true,
-                        isError = subjectNameError != null && subjectName.isNotBlank(),
-                        supportingText = {Text(text = subjectNameError.orEmpty())}
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    OutlinedTextField(
-                        value = goalHours,
-                        onValueChange = {onGoalHoursChange(it)},
-                        label = {Text("Goal Study Hours")},
-                        singleLine = true,
-                        isError = goalHoursError  != null && goalHours.isBlank(),
-                        supportingText = {Text(text = goalHoursError.orEmpty())},
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
                 }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = onConfirmButton,
-                    enabled = subjectNameError == null && goalHoursError == null
-                ) {
-                    Text("Save")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = onDismissRequest
-                ) {
-                    Text("Cancel")
-                }
+                OutlinedTextField(
+                    value = subjectName,
+                    onValueChange = {
+                        onSubjectNameChange(it)
+                    },
+                    label = { Text("Subject Name") },
+                    singleLine = true,
+                    isError = subjectNameError != null && subjectName.isNotBlank(),
+                    supportingText = { Text(text = subjectNameError.orEmpty()) })
+                Spacer(modifier = Modifier.height(10.dp))
+                OutlinedTextField(
+                    value = goalHours,
+                    onValueChange = { onGoalHoursChange(it) },
+                    label = { Text("Goal Study Hours") },
+                    singleLine = true,
+                    isError = goalHoursError != null && goalHours.isBlank(),
+                    supportingText = { Text(text = goalHoursError.orEmpty()) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
             }
-        )
+        }, confirmButton = {
+            TextButton(
+                onClick = onConfirmButton,
+                enabled = subjectNameError == null && goalHoursError == null
+            ) {
+                Text("Save")
+            }
+        }, dismissButton = {
+            TextButton(
+                onClick = onDismissRequest
+            ) {
+                Text("Cancel")
+            }
+        })
     }
 
 }

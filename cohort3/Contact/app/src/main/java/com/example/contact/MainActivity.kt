@@ -1,4 +1,4 @@
-package com.example.contact
+Modipackage com.example.contact
 
 import android.annotation.SuppressLint
 import android.os.Bundle

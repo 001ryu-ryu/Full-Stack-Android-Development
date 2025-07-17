@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import com.example.studysmart.domain.model.Session
 import com.example.studysmart.domain.model.Task
 
+// User actions with the dash board
 sealed class DashBoardEvent {
     data object SaveSubject: DashBoardEvent()
     data object DeleteSession: DashBoardEvent()

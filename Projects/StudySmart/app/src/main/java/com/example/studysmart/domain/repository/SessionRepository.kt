@@ -24,4 +24,5 @@ interface SessionRepository {
 
 
     suspend fun deleteSessionBySubjectId(subjectId: Int)
+    fun getRecentFiveSessions(): Flow<List<Session>>
 }
