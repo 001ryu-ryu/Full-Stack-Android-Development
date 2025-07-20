@@ -29,13 +29,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
+import com.example.bookbuddy.ui.navigation.Routes
 import com.example.bookbuddy.ui.viewmodel.BookViewModel
 
 @Composable
 fun BooksList(
     bookViewModel: BookViewModel = hiltViewModel(),
-    onClick: () -> Unit
+    onClick: (String) -> Unit
 ) {
     val booksState = bookViewModel.booksState.collectAsState()
 
@@ -60,7 +62,7 @@ fun BooksList(
                             bookName = book.bookName,
                             bookImage = book.bookImage,
                             bookAuthor = book.bookAuthor,
-                            onClick = onClick
+                            onClick = { onClick(book.bookUrl) }
                         )
                     }
                 }

@@ -14,6 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.bookbuddy.components.BookItem
 import com.example.bookbuddy.components.NavBackIcon
+import com.example.bookbuddy.ui.navigation.Routes
 import com.example.bookbuddy.ui.viewmodel.BookViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +41,9 @@ fun BooksOfCategoriesScreen(
                                 bookName = book.bookName,
                                 bookImage = book.bookImage,
                                 bookAuthor = book.bookAuthor
-                            ) { }
+                            ) {
+                                navHostController.navigate(Routes.PdfScreen(book.bookUrl))
+                            }
                         }
                     }
                 }

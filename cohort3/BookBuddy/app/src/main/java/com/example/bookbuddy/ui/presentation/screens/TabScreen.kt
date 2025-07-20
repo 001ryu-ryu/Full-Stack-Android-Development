@@ -82,7 +82,7 @@ fun TabScreen(modifier: Modifier = Modifier, navHostController: NavHostControlle
         ) {page ->
             when(page) {
                 0 -> CategoriesTab {navHostController.navigate(Routes.CategoriesOfBookScreen(it))}
-                1 -> BooksList() {}
+                1 -> BooksList() {navHostController.navigate(Routes.PdfScreen(it))}
             }
         }
     }

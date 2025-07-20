@@ -1,10 +1,13 @@
 package com.example.bookbuddy.ui.viewmodel
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookbuddy.common.ResultState
 import com.example.bookbuddy.data.model.Book
 import com.example.bookbuddy.domain.repository.BookRepository
+import com.rizzi.bouquet.ResourceType
+import com.rizzi.bouquet.VerticalPdfReaderState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +23,7 @@ class BookViewModel @Inject constructor(private val bookRepository: BookReposito
     init {
         getAllBooks()
     }
-    fun getAllBooks() {
+    private fun getAllBooks() {
         viewModelScope.launch(Dispatchers.IO) {
             bookRepository.getAllTasks().collect {
                 when(it) {

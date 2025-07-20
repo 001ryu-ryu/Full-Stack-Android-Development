@@ -9,6 +9,7 @@ plugins {
 }
 
 android {
+
     namespace = "com.example.bookbuddy"
     compileSdk = 36
 
@@ -44,6 +45,9 @@ android {
 }
 
 dependencies {
+
+    // Pdf
+    implementation("io.github.grizzi91:bouquet:1.1.3")
 
     //Room
     val room_version = "2.7.2"

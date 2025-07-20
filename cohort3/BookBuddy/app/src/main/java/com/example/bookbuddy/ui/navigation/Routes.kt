@@ -8,5 +8,8 @@ sealed class Routes {
     object HomeScreen: Routes()
 
     @Serializable
-    data class CategoriesOfBookScreen(val bookType: String)
+    data class CategoriesOfBookScreen(val bookType: String): Routes()
+
+    @Serializable
+    data class PdfScreen(val url: String): Routes()
 }
