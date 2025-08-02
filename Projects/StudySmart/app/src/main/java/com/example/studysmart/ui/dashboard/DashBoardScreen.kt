@@ -96,7 +96,6 @@ fun DashBoardScreen(
 ) {
 
 
-
     var isAddSubjectDialogOpen by rememberSaveable { mutableStateOf(false) }
     var isDeleteSessionDialogOpen by rememberSaveable { mutableStateOf(false) }
 
@@ -113,9 +112,9 @@ fun DashBoardScreen(
         selectedColors = state.subjectCardColors,
         subjectName = state.subjectName,
         goalHours = state.goalStudyHours,
-        onColorChange = {onEvent(DashBoardEvent.onSubjectCardColorChange(it))},
-        onSubjectNameChange = {onEvent(DashBoardEvent.onSubjectNameChange(it))},
-        onGoalHoursChange = {onEvent(DashBoardEvent.onGoalStudyHoursChange(it))}
+        onColorChange = { onEvent(DashBoardEvent.onSubjectCardColorChange(it)) },
+        onSubjectNameChange = { onEvent(DashBoardEvent.onSubjectNameChange(it)) },
+        onGoalHoursChange = { onEvent(DashBoardEvent.onGoalStudyHoursChange(it)) }
     )
 
     DeleteDialog(
@@ -130,7 +129,7 @@ fun DashBoardScreen(
             isDeleteSessionDialogOpen = false
         }
     )
-    
+
     Scaffold(
         topBar = { TopBar() }
     ) {
@@ -140,18 +139,18 @@ fun DashBoardScreen(
                 .padding(it)
         )
         {
-             item {
-                 CountCardSection(
-                     modifier = Modifier
-                         .fillMaxWidth()
-                         .padding(12.dp),
-                     subjectCount = state.totalSubjectCount,
-                     studiedHours = state.totalStudiedHours.toString(),
-                     goalHours = state.totalGoalStudyHours.toString()
-                 )
-             }
+            item {
+                CountCardSection(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    subjectCount = state.totalSubjectCount,
+                    studiedHours = state.totalStudiedHours.toString(),
+                    goalHours = state.totalGoalStudyHours.toString()
+                )
+            }
 
-            item { 
+            item {
                 SubjectCardsSection(
                     subjectList = state.subjects,
                     onAddIconClick = {
@@ -177,7 +176,7 @@ fun DashBoardScreen(
             tasksList(
                 sectionTitle = "UPCOMING TASKS",
                 tasks = tasks,
-                onCheckBoxClick = {onEvent(DashBoardEvent.onTaskIsCompleteChange(it))},
+                onCheckBoxClick = { onEvent(DashBoardEvent.onTaskIsCompleteChange(it)) },
                 onTaskCardClick = onTaskCardClick
             )
 
@@ -194,9 +193,9 @@ fun DashBoardScreen(
                     isDeleteSessionDialogOpen = true
                 }
             )
-            }
         }
     }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -209,10 +208,12 @@ fun TopBar() {
 }
 
 @Composable
-fun CountCardSection(modifier: Modifier = Modifier, 
-                     subjectCount: Int,
-                     studiedHours: String,
-                     goalHours: String) {
+fun CountCardSection(
+    modifier: Modifier = Modifier,
+    subjectCount: Int,
+    studiedHours: String,
+    goalHours: String
+) {
     Row(
         modifier = modifier.height(IntrinsicSize.Min)
         /*The fix worked because when you place a Row inside a LazyColumn,
@@ -256,8 +257,7 @@ fun SubjectCardsSection(
     onAddIconClick: () -> Unit,
     onSubjectCardClick: (Int?) -> Unit
 ) {
-    val context = LocalContext.current
-    Column { 
+    Column {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -302,8 +302,7 @@ fun SubjectCardsSection(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(start = 12.dp, end = 12.dp)
         ) {
-            items(subjectList) {
-                subject ->
+            items(subjectList) { subject ->
                 SubjectCard(
                     subjectName = subject.name,
                     gradientColors = subject.colors.map { Color(it) }

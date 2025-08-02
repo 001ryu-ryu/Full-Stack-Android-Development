@@ -5,9 +5,6 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="populateQuoteFromAssets()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="testPopulateQuoteFromAssets_InvalidJSON_expected_Exception()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>

@@ -95,7 +95,7 @@ fun TaskScreen(
     val taskDatePickerState: DatePickerState = rememberDatePickerState(
         initialSelectedDateMillis = Instant.now().toEpochMilli(),
        // selectableDates =
-            //DateValidatorPointForward(System.currentTimeMillis())
+           // DateValidatorPointForward(System.currentTimeMillis())
     )
 
     var relatedToSubjectText by remember { mutableStateOf("Select a subject") }
