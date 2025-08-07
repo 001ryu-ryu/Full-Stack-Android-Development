@@ -1,6 +1,5 @@
 package com.example.chatgptclone
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,18 +17,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,6 +34,15 @@ fun ChatScreen(modifier: Modifier) {
     val viewModel: ChatViewModel = hiltViewModel()
     val state = viewModel.state.collectAsState()
     var message by remember { mutableStateOf("") }
+    val streamingAssistantMessage by viewModel.streamingAssistantMessage.collectAsState()
+
+    // Collect streamFlow and update UI as soon as chunks arrive
+    LaunchedEffect(Unit) {
+        viewModel.streamFlow.collect { chunk ->
+            // No-op: state is already updated in ViewModel, this triggers recomposition
+        }
+    }
+
     Scaffold(
         containerColor = Color.DarkGray,
         topBar = {
@@ -51,14 +57,16 @@ fun ChatScreen(modifier: Modifier) {
                 .padding(innerPadding),
             verticalArrangement = Arrangement.Bottom
         ) {
-            Box(
-            )
-            {
+            Box() {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
                     reverseLayout = true
                 ) {
-                    items(state.value.asReversed()) {
+                    val chatItems = state.value.asReversed().toMutableList()
+                    if (!streamingAssistantMessage.isNullOrEmpty()) {
+                        chatItems.add(0, Chat(streamingAssistantMessage!!, "assistant"))
+                    }
+                    items(chatItems) {
                         Box(
                             modifier = Modifier.fillMaxWidth(),
                             contentAlignment = if (it.messageType == "user") {
