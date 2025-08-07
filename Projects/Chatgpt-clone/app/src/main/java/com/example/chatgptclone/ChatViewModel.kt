@@ -5,94 +5,118 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chatgptclone.repo.ChatRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ChatViewModel @Inject constructor(private val chatRepo: ChatRepo) : ViewModel() {
+class ChatViewModel @Inject constructor(private val repository: ChatRepo) : ViewModel() {
 
+    private val _chatHistoryState = MutableStateFlow<List<Chat>>(emptyList())
+    val chatHistoryState = _chatHistoryState.asStateFlow()
 
-    private var chatList = mutableListOf<Chat>()
-
-    var state = MutableStateFlow<List<Chat>>(emptyList())
-        private set
-
-    private var streamJob: Job? = null
-
-    val streamFlow = MutableSharedFlow<String>()
-
-    // Streaming assistant message
+    // Represents the raw, accumulating text from the current stream for potential separate UI display
     private val _streamingAssistantMessage = MutableStateFlow<String?>(null)
     val streamingAssistantMessage = _streamingAssistantMessage.asStateFlow()
 
-    fun createChatCompletion(message: String) {
-        Log.d("ChatVM", "createChatCompletion called with message: $message")
+    private var currentStreamJob: Job? = null
 
-        chatList.add(
-            Chat(
-                message = message,
-                messageType = "user"
-            )
-        )
-        state.value = chatList.toList()
-        Log.d("ChatVM", "User message added to chatList and state updated")
+    fun createChatCompletion(userMessageText: String) {
+        currentStreamJob?.cancel() // Cancel any existing stream
 
-        // Cancel previous stream if running
-        streamJob?.cancel()
-        Log.d("ChatVM", "Previous streamJob cancelled (if any)")
+        // 1. Add user message to history
+        val userChat = Chat(message = userMessageText, messageType = "user")
+        _chatHistoryState.value = _chatHistoryState.value + userChat
 
-        streamJob = viewModelScope.launch {
-            var assistantMessage = ""
-            _streamingAssistantMessage.value = ""
+        // Prepare message history for the repository
+        // Important: Create history from the *current* state *before* adding placeholders
+        val messagesHistoryForRepo = _chatHistoryState.value.map { chat ->
+            Pair(chat.messageType, chat.message)
+        }
 
-            Log.d("ChatVM", "Starting new stream from repo")
-            chatRepo.streamChatCompletion(message).collect { chunk ->
-                Log.d("ChatVM", "Received chunk: $chunk")
+        _streamingAssistantMessage.value = "" // Signal start of streaming for any separate UI observer
 
-                if (!chunk.startsWith("[error]:")) {
-                    assistantMessage += chunk
-                    streamFlow.emit(chunk)
-                    _streamingAssistantMessage.value = assistantMessage
-                    Log.d("ChatVM", "Emitting chunk to streamFlow")
+        currentStreamJob = viewModelScope.launch {
+            var accumulatedResponse = ""
+            var assistantMessageAdded = false
 
-                    // Update last assistant message or add a new one
-                    if (chatList.lastOrNull()?.messageType == "assistant") {
-                        chatList[chatList.lastIndex] = chatList.last().copy(message = assistantMessage)
-                        Log.d("ChatVM", "Updated existing assistant message")
-                    } else {
-                        chatList.add(Chat(message = assistantMessage, messageType = "assistant"))
-                        Log.d("ChatVM", "Added new assistant message")
+            try {
+                repository.streamChatCompletionWithHistory(messagesHistoryForRepo)
+                    .flowOn(Dispatchers.IO)
+                    .onEach { chunk ->
+                        if (chunk.startsWith("[error]:")) {
+                            Log.e("ChatVM", "Stream error chunk: $chunk")
+                            accumulatedResponse += chunk // Or handle as a distinct error message
+                            // Update or add error message in history
+                            if (assistantMessageAdded && _chatHistoryState.value.lastOrNull()?.messageType == "assistant") {
+                                val lastChat = _chatHistoryState.value.last()
+                                _chatHistoryState.value = _chatHistoryState.value.dropLast(1) + lastChat.copy(message = accumulatedResponse)
+                            } else {
+                                _chatHistoryState.value = _chatHistoryState.value + Chat(message = accumulatedResponse, messageType = "assistant")
+                                assistantMessageAdded = true
+                            }
+                            _streamingAssistantMessage.value = accumulatedResponse // Reflect error in raw stream too
+                            currentStreamJob?.cancel() // Stop further processing on handled error
+                            return@onEach
+                        }
+
+                        accumulatedResponse += chunk
+                        _streamingAssistantMessage.value = accumulatedResponse
+
+                        if (!assistantMessageAdded) {
+                            // First chunk, add new assistant message
+                            _chatHistoryState.value = _chatHistoryState.value + Chat(message = accumulatedResponse, messageType = "assistant")
+                            assistantMessageAdded = true
+                        } else {
+                            // Subsequent chunks, update existing assistant message
+                            val lastChat = _chatHistoryState.value.last()
+                            // Ensure we are updating the assistant's message
+                            if (lastChat.messageType == "assistant") {
+                                _chatHistoryState.value = _chatHistoryState.value.dropLast(1) + lastChat.copy(message = accumulatedResponse)
+                            } else {
+                                // This case should ideally not happen if logic is correct, but as a fallback:
+                                _chatHistoryState.value = _chatHistoryState.value + Chat(message = accumulatedResponse, messageType = "assistant")
+                            }
+                        }
                     }
-                    state.value = chatList.toList()
-                    Log.d("ChatVM", "State updated with assistant message")
-                } else {
-                    // Handle error case
-                    chatList.add(Chat(message = chunk, messageType = "assistant"))
-                    state.value = chatList.toList()
-                    _streamingAssistantMessage.value = null
-                    Log.e("ChatVM", "Error received from stream: $chunk")
-                }
+                    .catch { e ->
+                        Log.e("ChatVM", "Error in stream collection: ${e.message}", e)
+                        val errorMessage = "Error: ${e.message ?: "Unknown streaming error"}"
+                        if (assistantMessageAdded && _chatHistoryState.value.lastOrNull()?.messageType == "assistant") {
+                            val lastChat = _chatHistoryState.value.last()
+                            _chatHistoryState.value = _chatHistoryState.value.dropLast(1) + lastChat.copy(message = errorMessage)
+                        } else {
+                            _chatHistoryState.value = _chatHistoryState.value + Chat(message = errorMessage, messageType = "assistant")
+                        }
+                        _streamingAssistantMessage.value = null // Clear raw stream on error
+                    }
+                    .onCompletion {
+                        // This will be called on successful completion or cancellation (not due to an exception caught by .catch)
+                        _streamingAssistantMessage.value = null // Clear raw stream
+                        Log.d("ChatVM", "Stream completed.")
+                    }
+                    .collect() // Start collecting the flow
+            } catch (e: Exception) {
+                // Catch exceptions from launching the flow itself (e.g., if repository.stream... throws directly)
+                Log.e("ChatVM", "Error launching stream: ${e.message}", e)
+                val errorMessage = "Failed to start chat: ${e.message ?: "Unknown error"}"
+                _chatHistoryState.value = _chatHistoryState.value + Chat(message = errorMessage, messageType = "assistant")
+                _streamingAssistantMessage.value = null
             }
-            // After streaming is done, add the full assistant message to the chat list
-            if (assistantMessage.isNotEmpty()) {
-                if (chatList.lastOrNull()?.messageType == "assistant") {
-                    chatList[chatList.lastIndex] = chatList.last().copy(message = assistantMessage)
-                } else {
-                    chatList.add(Chat(message = assistantMessage, messageType = "assistant"))
-                }
-                state.value = chatList.toList()
-            }
-            _streamingAssistantMessage.value = null
         }
     }
 
     override fun onCleared() {
         super.onCleared()
-        streamJob?.cancel()
-        Log.d("ChatVM", "ViewModel cleared and streamJob cancelled")
+        currentStreamJob?.cancel()
+        Log.d("ChatVM", "ViewModel cleared, stream job cancelled.")
     }
 }
