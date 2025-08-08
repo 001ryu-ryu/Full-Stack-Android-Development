@@ -16,12 +16,19 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.network.KtorClient
+import com.example.simplerick.navigation.Routes
 import com.example.simplerick.screens.CharacterDetailsScreen
+import com.example.simplerick.screens.CharacterEpisodeScreen
 import com.example.simplerick.ui.theme.SimpleRickTheme
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val ktorClient = KtorClient()
+    @Inject
+    lateinit var ktorClient: KtorClient
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -30,20 +37,20 @@ class MainActivity : ComponentActivity() {
             SimpleRickTheme {
                 val navController = rememberNavController()
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    NavHost(navController = navController, startDestination = "character_details") {
-                        composable("character_details") {
+                    NavHost(navController = navController, startDestination = Routes.CharacterDetailsScreen) {
+                        composable<Routes.CharacterDetailsScreen> {
                             CharacterDetailsScreen(
                                 ktorClient = ktorClient,
-                                characterId = 1,
+                                characterId = 4,
                                 modifier = Modifier.padding(innerPadding)
                             ) {
-                                navController.navigate("character_episodes/$it")
+                                navController.navigate(Routes.CharacterEpisodeScreen(it))
                             }
                         }
 
-                        composable("character_episodes/{characterId}") {backStackEntry ->
-                            val characterId: Int = backStackEntry.arguments?.getInt("characterId") ?: -1
-                            CharacterEpisodeScreen(characterId)
+                        composable<Routes.CharacterEpisodeScreen> { backStackEntry ->
+                            val characterId = backStackEntry.toRoute<Routes.CharacterEpisodeScreen>().characterId
+                            CharacterEpisodeScreen(characterId, ktorClient)
                         }
                     }
 
@@ -53,12 +60,3 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun CharacterEpisodeScreen(characterId: Int) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = "Character Episode Screen: $characterId", fontSize = 28.sp)
-    }
-}

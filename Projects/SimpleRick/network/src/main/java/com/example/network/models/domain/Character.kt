@@ -2,6 +2,7 @@ package com.example.network.models.domain
 
 data class Character(
     val created: String,
+    val episodeIds: List<Int>,
     val episodeUrls: List<String>,
     val gender: CharacterGender,
     val id: Int,

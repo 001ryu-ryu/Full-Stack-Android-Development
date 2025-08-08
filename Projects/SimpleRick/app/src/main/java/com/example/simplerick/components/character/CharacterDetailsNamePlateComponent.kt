@@ -26,12 +26,3 @@ fun CharacterDetailsNamePlateComponent(name: String, status: CharacterStatus) {
         )
     }
 }
-
-@Preview
-@Composable
-fun Prev() {
-    CharacterDetailsNamePlateComponent(
-        name = "Rick",
-        status = CharacterStatus.Alive
-    )
-}

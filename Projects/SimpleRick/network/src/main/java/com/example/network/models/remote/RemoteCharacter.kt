@@ -47,6 +47,7 @@ fun RemoteCharacter.toDomainCharacter(): Character {
     }
     return Character(
         created = created,
+        episodeIds = episode.map { it.substring(it.lastIndexOf("/") + 1).toInt() },
         episodeUrls = episode,
         gender = characterGender,
         id = id,

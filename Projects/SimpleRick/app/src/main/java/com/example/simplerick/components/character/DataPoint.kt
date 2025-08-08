@@ -31,14 +31,3 @@ fun DataPointComponent(dataPoint: DataPoint) {
 
     }
 }
-
-@Preview
-@Composable
-fun PreviewData() {
-    DataPointComponent(
-        DataPoint(
-            title = "RIck",
-            description = "Morty"
-        )
-    )
-}
