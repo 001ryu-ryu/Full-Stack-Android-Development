@@ -40,7 +40,6 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = Routes.CharacterDetailsScreen) {
                         composable<Routes.CharacterDetailsScreen> {
                             CharacterDetailsScreen(
-                                ktorClient = ktorClient,
                                 characterId = 4,
                                 modifier = Modifier.padding(innerPadding)
                             ) {
